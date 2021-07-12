@@ -1,6 +1,6 @@
 # HostList
 
-修改自https://github.com/dbdoer/hotspot-online 源码
+修改自hotspot-online 源码
 
 ![sy.png](https://i.loli.net/2021/07/13/bDGfsIK3Q86nZeC.png)
 
