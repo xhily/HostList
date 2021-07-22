@@ -7,7 +7,6 @@ import json
 from urllib import parse
 from lxml import etree
 
-
 str1 ='''{"name":"'''
 str2 ='''","url": "'''
 str3 ='''"},'''
@@ -19,10 +18,14 @@ except:
 
 #微博热点排行榜
 def parse_weibo():
-    fname = os.getcwd()+"\\json\\" +"weibo.json"
+    fname = "weibo.json"
     weibo_ssrd = "https://s.weibo.com/top/summary?cate=realtimehot"
     weibo = "https://s.weibo.com"
-    r = requests.get(weibo_ssrd)
+    zhihu_all = "https://www.zhihu.com/hot"
+    headers = {'user-agent':'Baiduspider',
+               'cookie':'_s_tentry=-; Apache=3536830018100.7607.1626435767316; SINAGLOBAL=3536830018100.7607.1626435767316; ULV=1626435767321:1:1:1:3536830018100.7607.1626435767316:'          
+    }
+    r = requests.get(weibo_ssrd,headers = headers)
     r.encoding='utf-8'
     soup = etree.HTML(r.text)
     str_list=""
@@ -39,7 +42,7 @@ def parse_weibo():
 
 #百度热度榜单
 def baidu_hot():
-    fname = os.getcwd() + "\\json\\" + "baidu.json"
+    fname = "baidu.json"
     baiduhot = "https://top.baidu.com/board?tab=realtime"
     r = requests.get(baiduhot)
     soup = etree.HTML(r.text)
@@ -53,14 +56,14 @@ def baidu_hot():
 
 #今日头条榜单
 def jr_toutiao():
-    fname = os.getcwd() + "\\json\\" + "toutiao.json"
+    fname = "toutiao.json"
     url = "https://www.toutiao.com/hot-event/hot-board/?origin=toutiao_pc"
     response = urllib.request.urlopen(url)
     data = json.loads(response.read())
     news = data['data']
     str_list = ""
     for i in news:
-        title = i["Title"]
+        title = i["Title"].replace('"', "'")
         url = i["Url"]
         str_list = str_list + str1 + title + str2 + url + str3 + "\n"
     with open(fname,"w+",encoding='utf-8') as f:
@@ -68,9 +71,12 @@ def jr_toutiao():
 
 #神马搜索榜单
 def shenma():
-    fname = os.getcwd() + "\\json\\" + "shenma.json"
+    fname = "shenma.json"
     shenmahot = "https://m.sm.cn/s?q=%E7%A5%9E%E9%A9%AC%E6%96%B0%E9%97%BB%E6%A6%9C%E5%8D%95&ext=request_smbd_channel%3Asm_index&from=smor"
-    r = requests.get(shenmahot)
+    headers = {'user-agent':'Mozilla/5.0 (Linux; Android 8.0; MI 6 Build/OPR1-wesley_iui-19.01.24; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/57.0.2987.132 MQQBrowser/6.2 TBS/044408 Mobile Safari/537.36 MMWEBID/1394 MicroMessenger/7.0.3.1400(0x27000334) Process/tools NetType/WIFI Language/zh_CN',
+               'cookie':'cna=Nl94Gejb2VcCAaZvBGQys15b; isg=BDEx7Oeq9THOcFkl8sQY-IiFQL3LHqWQsuxkpxNGLfgXOlGMW261YN9IWshc6T3I; l=eBrur1pIjtc3sHP9BOfanurza77OSIRYYuPzaNbMiOCP_Q1B53tNB6TfMwY6C3GRh6kWR35v8Wk8BeYBqQAonxvOySKKKvDmn; tfstk=cOGVB7blbId2AoN6pSNN5uvZSd3AwUinbTzbnY6LwginOrfD1GUkberzVOdTn'          
+    }
+    r = requests.get(shenmahot,headers=headers)
     soup = etree.HTML(r.text)
     str_list = ""
     for soup_a in soup.xpath("//*[@id='sc_news_top_list_lg_1_1']/div/a/div/span/span"):
@@ -82,25 +88,13 @@ def shenma():
     with open(fname,"w+",encoding='utf-8') as f:
         f.write(str_list)
 
-# #央视新闻榜单
-# def cctv_news():
-#     fname = os.getcwd() + "\\json\\" + "cctv.json"
-#     cctvhot = "https://news.cctv.com/"
-#     r = requests.get(cctvhot)
-#     soup = etree.HTML(r.text)
-#     str_list = ""
-#     for soup_a in soup.xpath("//*[@id='newslist']/li/div/h3[@class='title']/a"):
-#         cctv_name = soup_a.text
-#         cctv_url = soup_a.get('href')
-#         str_list = str_list + str1 + cctv_name + str2 + cctv_url + str3 + "\n"
-#     with open(fname,"w+",encoding='utf-8') as f:
-#         f.write(str_list)
+
 
 #知乎热搜榜
 def zhihu():
-    fname = os.getcwd() + "\\json\\" + "zhihu.json"
+    fname = "zhihu.json"
     zhihurl = "https://api.zhihu.com/topstory/hot-lists/total?limit=10"
-    response = urllib.request.urlopen(zhihurl)
+    response = urllib.request.urlopen(zhihurl,proxies={'http':'42.57.151.71:9999'})
     data = json.loads(response.read())
     zhihudata = data['data']
     str_list = ""
@@ -113,8 +107,8 @@ def zhihu():
         f.write(str_list)
 
 #中国新闻网
-def chinanews():
-    fname = os.getcwd() + "\\json\\" + "chinanews.json"
+def chinanew():
+    fname = "chinanews.json"
     chinanews = "https://www.chinanews.com/scroll-news/news1.html"
     r = requests.get(chinanews)
     r.encoding = 'utf-8'
@@ -127,10 +121,9 @@ def chinanews():
     with open(fname,"w+",encoding='utf-8') as f:
         f.write(str_list)
 
-
 #微信热门文章
 def weixinnew():
-    fname = os.getcwd() + "\\json\\" + "weixinnews.json"
+    fname ="weixinnews.json"
     weixinnews = "https://weixin.sogou.com/"
     r = requests.get(weixinnews)
     r.encoding = 'utf-8'
@@ -143,16 +136,10 @@ def weixinnew():
     with open(fname,"w+",encoding='utf-8') as f:
         f.write(str_list)
 
-
 if __name__ == "__main__":
-    while True:
-        try:
-            baidu_hot()
-            parse_weibo()
-            jr_toutiao()
-            shenma()
-            weixinnew()
-            chinanews()
-        except:
-            print("采集出现一个错误，请及时更新规则！")
-        time.sleep(600) #每隔600秒也即十分钟更新一次
+    baidu_hot()
+    parse_weibo()
+    jr_toutiao()
+    shenma()
+    weixinnew()
+    chinanew()
